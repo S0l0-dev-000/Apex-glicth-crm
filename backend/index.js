@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const db = require('./db');
+const { sendCustomerNotification, sendDocumentNotification } = require('./emailService');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -87,7 +88,7 @@ app.get('/api/customers/:id', (req, res) => {
 });
 
 // POST new customer
-app.post('/api/customers', (req, res) => {
+app.post('/api/customers', async (req, res) => {
   const customerData = req.body;
   
   if (!customerData.name || !customerData.email) {
@@ -101,11 +102,21 @@ app.post('/api/customers', (req, res) => {
 
   const query = `INSERT INTO customers (${fields.join(', ')}) VALUES (${placeholders})`;
 
-  db.run(query, values, function(err) {
+  db.run(query, values, async function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
+    
+    // Send email notification
+    try {
+      await sendCustomerNotification(customerData);
+      console.log('Customer notification email sent successfully');
+    } catch (emailError) {
+      console.error('Error sending customer notification email:', emailError);
+      // Don't fail the request if email fails
+    }
+    
     res.json({ id: this.lastID, ...customerData });
   });
 });
@@ -156,7 +167,7 @@ app.delete('/api/customers/:id', (req, res) => {
 // File Upload Endpoints
 
 // POST upload document
-app.post('/api/customers/:id/documents', upload.single('document'), (req, res) => {
+app.post('/api/customers/:id/documents', upload.single('document'), async (req, res) => {
   const customerId = req.params.id;
   const { category, description } = req.body;
   
@@ -186,11 +197,26 @@ app.post('/api/customers/:id/documents', upload.single('document'), (req, res) =
     documentData.file_type,
     documentData.category,
     documentData.description
-  ], function(err) {
+  ], async function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
+    
+    // Send email notification for document upload
+    try {
+      // Get customer data for the email
+      db.get('SELECT * FROM customers WHERE id = ?', [customerId], async (customerErr, customer) => {
+        if (!customerErr && customer) {
+          await sendDocumentNotification(customer, documentData);
+          console.log('Document notification email sent successfully');
+        }
+      });
+    } catch (emailError) {
+      console.error('Error sending document notification email:', emailError);
+      // Don't fail the request if email fails
+    }
+    
     res.json({ 
       id: this.lastID, 
       ...documentData,
