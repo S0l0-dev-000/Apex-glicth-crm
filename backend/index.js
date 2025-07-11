@@ -375,6 +375,42 @@ function authenticateToken(req, res, next) {
 // Protect customer and document routes
 app.use(['/api/customers', '/api/customers/:id', '/api/customers/:id/documents'], authenticateToken);
 
+// Change password endpoint (admin or user)
+app.post('/api/change-password', authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current and new password are required' });
+  }
+  db.get('SELECT * FROM users WHERE id = ?', [req.user.id], async (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, req.user.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Password updated successfully' });
+    });
+  });
+});
+
+// Change email endpoint (admin or user)
+app.post('/api/change-email', authenticateToken, async (req, res) => {
+  const { newEmail } = req.body;
+  if (!newEmail) {
+    return res.status(400).json({ error: 'New email is required' });
+  }
+  // Check if email already exists
+  db.get('SELECT * FROM users WHERE email = ?', [newEmail], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (user) return res.status(400).json({ error: 'Email already in use' });
+    db.run('UPDATE users SET email = ? WHERE id = ?', [newEmail, req.user.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Email updated successfully', newEmail });
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 }); 

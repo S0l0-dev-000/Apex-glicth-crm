@@ -1,11 +1,50 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Avatar } from '@mui/material';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Typography, Button, Box, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Alert } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import BusinessIcon from '@mui/icons-material/Business';
 import AddIcon from '@mui/icons-material/Add';
 import PeopleIcon from '@mui/icons-material/People';
 
 const Navbar = ({ user, onLogout }) => {
+  const [openPassword, setOpenPassword] = useState(false);
+  const [openEmail, setOpenEmail] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newEmail, setNewEmail] = useState(user?.email || '');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  const handlePasswordChange = async () => {
+    setMessage(''); setError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to change password');
+      setMessage('Password updated successfully!');
+      setCurrentPassword(''); setNewPassword('');
+    } catch (e) { setError(e.message); }
+  };
+
+  const handleEmailChange = async () => {
+    setMessage(''); setError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/change-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ newEmail })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to change email');
+      setMessage('Email updated successfully!');
+    } catch (e) { setError(e.message); }
+  };
+
   return (
     <AppBar 
       position="static" 
@@ -99,6 +138,12 @@ const Navbar = ({ user, onLogout }) => {
               <Typography sx={{ color: 'white', mx: 2, fontWeight: 500 }}>
                 {user.email}
               </Typography>
+              <Button color="inherit" onClick={() => setOpenEmail(true)} sx={{ borderRadius: 2, px: 3, py: 1 }}>
+                Change Email
+              </Button>
+              <Button color="inherit" onClick={() => setOpenPassword(true)} sx={{ borderRadius: 2, px: 3, py: 1 }}>
+                Change Password
+              </Button>
               <Button color="inherit" onClick={onLogout} sx={{ borderRadius: 2, px: 3, py: 1 }}>
                 Logout
               </Button>
@@ -110,6 +155,51 @@ const Navbar = ({ user, onLogout }) => {
           )}
         </Box>
       </Toolbar>
+      {/* Change Password Dialog */}
+      <Dialog open={openPassword} onClose={() => setOpenPassword(false)}>
+        <DialogTitle>Change Password</DialogTitle>
+        <DialogContent>
+          {message && <Alert severity="success">{message}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
+          <TextField
+            label="Current Password"
+            type="password"
+            value={currentPassword}
+            onChange={e => setCurrentPassword(e.target.value)}
+            fullWidth sx={{ mb: 2 }}
+          />
+          <TextField
+            label="New Password"
+            type="password"
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPassword(false)}>Cancel</Button>
+          <Button onClick={handlePasswordChange} variant="contained">Change</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Change Email Dialog */}
+      <Dialog open={openEmail} onClose={() => setOpenEmail(false)}>
+        <DialogTitle>Change Email</DialogTitle>
+        <DialogContent>
+          {message && <Alert severity="success">{message}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
+          <TextField
+            label="New Email"
+            type="email"
+            value={newEmail}
+            onChange={e => setNewEmail(e.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEmail(false)}>Cancel</Button>
+          <Button onClick={handleEmailChange} variant="contained">Change</Button>
+        </DialogActions>
+      </Dialog>
     </AppBar>
   );
 };
