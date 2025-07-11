@@ -172,7 +172,8 @@ function App() {
   React.useEffect(() => {
     const checkAdminExists = async () => {
       try {
-        const response = await fetch(`https://backend-stere8xpq-solos-projects-3bdcd80e.vercel.app/api/admin-exists`);
+        const { API_BASE_URL } = await import('./config');
+        const response = await fetch(`${API_BASE_URL}/api/admin-exists`);
         const data = await response.json();
         setAdminExists(data.adminExists);
       } catch (error) {

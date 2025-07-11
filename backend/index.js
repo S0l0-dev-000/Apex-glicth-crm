@@ -347,7 +347,7 @@ app.post('/api/register', async (req, res) => {
   }
   
   // Check secret code
-  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'ADMIN_SECRET_2024';
+  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'lance';
   if (!secretCode || secretCode !== adminSecretCode) {
     return res.status(403).json({ error: 'Invalid secret code' });
   }
@@ -469,7 +469,7 @@ app.post('/api/create-admin', authenticateToken, async (req, res) => {
   }
   
   // Check secret code
-  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'ADMIN_SECRET_2024';
+  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'lance';
   if (!secretCode || secretCode !== adminSecretCode) {
     return res.status(403).json({ error: 'Invalid secret code' });
   }
