@@ -45,11 +45,11 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([
+  const [users] = useState([
     // Mock data since we don't have users endpoint yet
     { id: 1, email: 'admin@yourcompany.com', role: 'admin', created_at: '2024-01-01', status: 'active' }
   ]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false); // TODO: Uncomment when implementing real API calls
   const [editDialog, setEditDialog] = useState({ open: false, user: null });
   const [createDialog, setCreateDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, user: null });
