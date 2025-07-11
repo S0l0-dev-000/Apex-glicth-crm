@@ -69,7 +69,8 @@ const Login = ({ onLogin }) => {
           </Button>
         </form>
         <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Link to="/register">Register as a regular user</Link>
+          <Link to="/register" style={{ display: 'block', marginBottom: '8px' }}>Register as a regular user</Link>
+          <Link to="/admin-setup">Need to set up admin account?</Link>
         </Box>
       </Paper>
     </Box>

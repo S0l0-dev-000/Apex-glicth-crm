@@ -63,6 +63,17 @@ app.get('/', (req, res) => {
   res.send('CRM Backend is running!');
 });
 
+// Check if admin exists
+app.get('/api/admin-exists', (req, res) => {
+  db.get('SELECT COUNT(*) as count FROM users WHERE role = ?', ['admin'], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ adminExists: row.count > 0 });
+  });
+});
+
 // GET all customers
 app.get('/api/customers', (req, res) => {
   db.all('SELECT * FROM customers ORDER BY created_at DESC', (err, rows) => {
@@ -307,10 +318,17 @@ app.get('/api/documents/:id/download', (req, res) => {
 
 // Register endpoint (for initial admin setup)
 app.post('/api/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, secretCode } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
+  
+  // Check secret code
+  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'ADMIN_SECRET_2024';
+  if (!secretCode || secretCode !== adminSecretCode) {
+    return res.status(403).json({ error: 'Invalid secret code' });
+  }
+  
   // Check if any admin already exists
   db.get('SELECT * FROM users WHERE role = ?', ['admin'], async (err, admin) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -421,10 +439,17 @@ app.post('/api/create-admin', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Only admins can create other admins.' });
   }
-  const { email, password } = req.body;
+  const { email, password, secretCode } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
+  
+  // Check secret code
+  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'ADMIN_SECRET_2024';
+  if (!secretCode || secretCode !== adminSecretCode) {
+    return res.status(403).json({ error: 'Invalid secret code' });
+  }
+  
   db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
     if (user) return res.status(400).json({ error: 'User already exists' });

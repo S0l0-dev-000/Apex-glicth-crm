@@ -16,6 +16,7 @@ const Navbar = ({ user, onLogout }) => {
   const [openCreateAdmin, setOpenCreateAdmin] = useState(false);
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [adminSecretCode, setAdminSecretCode] = useState('');
   const [adminMessage, setAdminMessage] = useState('');
   const [adminError, setAdminError] = useState('');
 
@@ -23,7 +24,7 @@ const Navbar = ({ user, onLogout }) => {
     setMessage(''); setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/change-password', {
+      const res = await fetch('https://apex-glicth-crm-v7kj.vercel.app/api/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ currentPassword, newPassword })
@@ -39,7 +40,7 @@ const Navbar = ({ user, onLogout }) => {
     setMessage(''); setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/change-email', {
+      const res = await fetch('https://apex-glicth-crm-v7kj.vercel.app/api/change-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ newEmail })
@@ -54,15 +55,15 @@ const Navbar = ({ user, onLogout }) => {
     setAdminMessage(''); setAdminError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/create-admin', {
+      const res = await fetch('https://apex-glicth-crm-v7kj.vercel.app/api/create-admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword })
+        body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword, secretCode: adminSecretCode })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create admin');
       setAdminMessage('Admin created successfully!');
-      setNewAdminEmail(''); setNewAdminPassword('');
+      setNewAdminEmail(''); setNewAdminPassword(''); setAdminSecretCode('');
     } catch (e) { setAdminError(e.message); }
   };
 
@@ -244,7 +245,15 @@ const Navbar = ({ user, onLogout }) => {
             type="password"
             value={newAdminPassword}
             onChange={e => setNewAdminPassword(e.target.value)}
+            fullWidth sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Admin Secret Code"
+            type="password"
+            value={adminSecretCode}
+            onChange={e => setAdminSecretCode(e.target.value)}
             fullWidth
+            helperText="Enter the admin secret code"
           />
         </DialogContent>
         <DialogActions>
