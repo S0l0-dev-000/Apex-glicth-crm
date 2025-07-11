@@ -1,18 +1,37 @@
-import React from 'react';
+import React, { Suspense, lazy, memo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Container, Box } from '@mui/material';
-import CustomerList from './components/CustomerList';
-import CustomerForm from './components/CustomerForm';
+import { Container, Box, CircularProgress, Typography } from '@mui/material';
 import Navbar from './components/Navbar';
-import Login from './components/Login';
-import Register from './components/Register';
-import AdminSetup from './components/AdminSetup';
-import AddAdmin from './components/AddAdmin';
-import AdminDashboard from './components/AdminDashboard';
-import UserManagement from './components/UserManagement';
-import Analytics from './components/Analytics';
+
+// Lazy load components for better performance
+const CustomerList = lazy(() => import('./components/CustomerList'));
+const CustomerForm = lazy(() => import('./components/CustomerForm'));
+const Login = lazy(() => import('./components/Login'));
+const Register = lazy(() => import('./components/Register'));
+const AdminSetup = lazy(() => import('./components/AdminSetup'));
+const AddAdmin = lazy(() => import('./components/AddAdmin'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const UserManagement = lazy(() => import('./components/UserManagement'));
+const Analytics = lazy(() => import('./components/Analytics'));
+
+// Loading component
+const LoadingSpinner = memo(() => (
+  <Box 
+    display="flex" 
+    flexDirection="column" 
+    justifyContent="center" 
+    alignItems="center" 
+    minHeight="50vh"
+    gap={2}
+  >
+    <CircularProgress size={40} />
+    <Typography variant="body2" color="text.secondary">
+      Loading...
+    </Typography>
+  </Box>
+));
 
 function UserDashboard() {
   return <div style={{textAlign: 'center', marginTop: '4rem'}}><h2>User Dashboard</h2><p>Welcome, regular user!</p></div>;
@@ -209,32 +228,34 @@ function App() {
         }}>
           <Navbar user={user} onLogout={handleLogout} />
           <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flex: 1 }}>
-            <Routes>
-              <Route path="/admin-setup" element={<AdminSetup />} />
-              <Route path="/add-admin" element={<AddAdmin />} />
-              <Route path="/login" element={<Login onLogin={handleLogin} />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/user-dashboard" element={<UserDashboard />} />
-              <Route path="/*" element={
-                // Show admin setup if no admin exists
-                adminExists === false ? (
-                  <AdminSetup />
-                ) : user && token ? (
-                  <Routes>
-                    <Route path="/" element={user.role === 'admin' ? <AdminDashboard /> : <CustomerList />} />
-                    <Route path="/dashboard" element={<AdminDashboard />} />
-                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                    <Route path="/admin/users" element={<UserManagement />} />
-                    <Route path="/admin/analytics" element={<Analytics />} />
-                    <Route path="/customers" element={<CustomerList />} />
-                    <Route path="/customers/new" element={<CustomerForm />} />
-                    <Route path="/customers/:id" element={<CustomerForm />} />
-                  </Routes>
-                ) : (
-                  <Login onLogin={handleLogin} />
-                )
-              } />
-            </Routes>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                <Route path="/admin-setup" element={<AdminSetup />} />
+                <Route path="/add-admin" element={<AddAdmin />} />
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/user-dashboard" element={<UserDashboard />} />
+                <Route path="/*" element={
+                  // Show admin setup if no admin exists
+                  adminExists === false ? (
+                    <AdminSetup />
+                  ) : user && token ? (
+                    <Routes>
+                      <Route path="/" element={user.role === 'admin' ? <AdminDashboard /> : <CustomerList />} />
+                      <Route path="/dashboard" element={<AdminDashboard />} />
+                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                      <Route path="/admin/users" element={<UserManagement />} />
+                      <Route path="/admin/analytics" element={<Analytics />} />
+                      <Route path="/customers" element={<CustomerList />} />
+                      <Route path="/customers/new" element={<CustomerForm />} />
+                      <Route path="/customers/:id" element={<CustomerForm />} />
+                    </Routes>
+                  ) : (
+                    <Login onLogin={handleLogin} />
+                  )
+                } />
+              </Routes>
+            </Suspense>
           </Container>
         </Box>
       </Router>

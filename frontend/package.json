@@ -1,6 +1,7 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "apex-glitch-crm-frontend",
+  "version": "2.0.0",
+  "description": "APEX GLITCH CRM - Modern, high-performance customer relationship management frontend",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -22,7 +23,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build:analyze": "npm run build && npx webpack-bundle-analyzer build/static/js/*.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

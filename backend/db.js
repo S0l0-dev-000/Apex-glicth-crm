@@ -129,6 +129,38 @@ db.serialize(() => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS emails (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      customer_id INTEGER NOT NULL,
+      to_email TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      body TEXT NOT NULL,
+      template TEXT,
+      status TEXT DEFAULT 'pending',
+      sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create indexes for better query performance
+  db.run(`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers (email)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_customers_company ON customers (company)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_customers_created_at ON customers (created_at)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_documents_customer_id ON documents (customer_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_documents_category ON documents (category)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_documents_uploaded_at ON documents (uploaded_at)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_users_role ON users (role)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_emails_customer_id ON emails (customer_id)`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_emails_status ON emails (status)`);
 });
+
+// Enable WAL mode for better performance
+db.run("PRAGMA journal_mode=WAL");
+db.run("PRAGMA synchronous=NORMAL");
+db.run("PRAGMA cache_size=10000");
+db.run("PRAGMA temp_store=MEMORY");
 
 module.exports = db; 

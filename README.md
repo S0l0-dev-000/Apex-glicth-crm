@@ -57,11 +57,13 @@ node create-admin.js admin@yourcompany.com yourpassword123
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React, Material-UI, Axios
-- **Backend:** Node.js, Express, SQLite
-- **Authentication:** JWT
-- **File Storage:** Local uploads with database tracking
-- **Email:** SMTP integration
+- **Frontend:** React 19, Material-UI, Axios (with lazy loading & performance optimization)
+- **Backend:** Node.js, Express, SQLite with WAL mode, compression & security middleware
+- **Authentication:** JWT with bcrypt
+- **File Storage:** Local uploads with database tracking & validation
+- **Email:** SMTP integration with HTML templates
+- **Security:** Helmet, CORS, rate limiting, input validation
+- **Performance:** Database indexes, compression, caching, bundle optimization
 
 ## 📚 Database Schema
 
@@ -105,19 +107,60 @@ JWT_SECRET=your-jwt-secret
 
 ## 🚀 Deployment
 
-### Backend (Vercel)
+### Quick Deployment
+```bash
+# One-command optimized deployment
+./deploy.sh
+```
+
+### Manual Deployment
+
+#### Backend (Vercel)
 ```bash
 cd backend
+npm install
 vercel --prod
 ```
 
-### Frontend (Vercel)
+#### Frontend (Vercel)
 ```bash
 cd frontend
+npm install
+npm run build
 vercel --prod
 ```
 
-*Update frontend config with your backend URL after deployment.*
+### Performance Monitoring
+```bash
+# Check app health and performance
+./performance-check.sh
+```
+
+## ⚡ Performance Features
+
+- **Frontend Optimizations:**
+  - React lazy loading for faster initial load
+  - Component memoization for reduced re-renders
+  - Bundle size optimization (source maps disabled in production)
+  - Modern Material-UI theme with optimized components
+
+- **Backend Optimizations:**
+  - Gzip compression for reduced payload size
+  - Database WAL mode for better concurrent access
+  - Indexed database queries for faster lookups
+  - Rate limiting to prevent abuse (100 requests/15 minutes)
+
+- **Security Enhancements:**
+  - Helmet middleware for security headers
+  - CORS protection with specific origins
+  - Input validation and file type restrictions
+  - Comprehensive error handling with proper status codes
+
+- **Database Performance:**
+  - SQLite WAL mode enabled
+  - Strategic indexes on frequently queried columns
+  - Connection pooling and cache optimization
+  - Prepared statements for query performance
 
 ## 📖 API Documentation
 
