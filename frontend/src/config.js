@@ -10,5 +10,5 @@ const config = {
 };
 
 const environment = process.env.NODE_ENV || 'development';
-export const API_BASE_URL = "https://apex-glicth-crm-v7kj.vercel.app";
+export const API_BASE_URL = "https://backend-stere8xpq-solos-projects-3bdcd80e.vercel.app";
 export const UPLOAD_BASE_URL = config[environment].uploadUrl; 

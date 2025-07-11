@@ -15,7 +15,7 @@ import {
   IconButton
 } from '@mui/material';
 import { 
-  AdminPanelSettings as AdminIcon,
+  PersonAdd as PersonAddIcon,
   Security as SecurityIcon,
   Visibility,
   VisibilityOff,
@@ -24,7 +24,7 @@ import {
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
-const AdminSetup = () => {
+const AddAdmin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -62,17 +62,28 @@ const AdminSetup = () => {
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/api/register`, {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('You must be logged in as an admin to create new admin accounts');
+        setLoading(false);
+        return;
+      }
+
+      await axios.post(`${API_BASE_URL}/api/create-admin`, {
         email,
         password,
         secretCode
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
-      setSuccess('Admin account created successfully! Redirecting to login...');
-      setTimeout(() => {
-        // Refresh the page to update admin status
-        window.location.href = '/login';
-      }, 2000);
+      setSuccess('New admin account created successfully!');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setSecretCode('');
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to create admin account');
     } finally {
@@ -89,34 +100,22 @@ const AdminSetup = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #1a237e 0%, #0277bd 100%)',
-        p: 2
-      }}
-    >
+    <Box sx={{ p: 3 }}>
       <Paper
-        elevation={24}
+        elevation={8}
         sx={{
           p: 4,
           maxWidth: 500,
-          width: '100%',
-          borderRadius: 4,
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
+          mx: 'auto',
+          borderRadius: 3,
         }}
       >
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <AdminIcon 
+          <PersonAddIcon 
             sx={{ 
               fontSize: 60, 
               color: 'primary.main',
               mb: 2,
-              filter: 'drop-shadow(0 4px 8px rgba(26, 35, 126, 0.3))'
             }} 
           />
           <Typography 
@@ -125,20 +124,17 @@ const AdminSetup = () => {
             gutterBottom
             sx={{ 
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #1a237e, #0277bd)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: 'primary.main',
             }}
           >
-            Admin Setup
+            Add New Admin
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Create your administrator account to get started
+            Create a new administrator account
           </Typography>
         </Box>
 
-        <Card sx={{ mb: 3, bgcolor: 'rgba(26, 35, 126, 0.05)' }}>
+        <Card sx={{ mb: 3, bgcolor: 'rgba(25, 118, 210, 0.05)' }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <SecurityIcon sx={{ color: 'primary.main', mr: 1 }} />
@@ -148,13 +144,13 @@ const AdminSetup = () => {
             </Box>
             <Divider sx={{ mb: 2 }} />
             <Typography variant="body2" color="text.secondary" paragraph>
-              • A secret code is required to create admin accounts
+              • You must be logged in as an admin to create new admin accounts
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              • Password must be at least 8 characters long
+              • The secret code is required for security verification
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              • Only one admin account can be created initially
+              • Password must be at least 8 characters long
             </Typography>
           </CardContent>
         </Card>
@@ -231,7 +227,7 @@ const AdminSetup = () => {
                 </InputAdornment>
               ),
             }}
-            helperText="Enter the secret code provided by your system administrator"
+            helperText="Enter the secret code (lance)"
           />
 
           {error && (
@@ -252,14 +248,14 @@ const AdminSetup = () => {
             variant="contained"
             disabled={loading}
             sx={{
-              mt: 2,
               py: 1.5,
               fontSize: '1.1rem',
               fontWeight: 600,
-              background: 'linear-gradient(45deg, #1a237e, #0277bd)',
+              borderRadius: 2,
+              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
               '&:hover': {
-                background: 'linear-gradient(45deg, #000051, #004c8c)',
-              },
+                background: 'linear-gradient(45deg, #1565c0, #1976d2)',
+              }
             }}
           >
             {loading ? (
@@ -268,22 +264,19 @@ const AdminSetup = () => {
               'Create Admin Account'
             )}
           </Button>
-        </form>
 
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            Already have an account?{' '}
-            <Button 
-              onClick={() => navigate('/login')}
-              sx={{ textTransform: 'none', fontWeight: 600 }}
-            >
-              Sign In
-            </Button>
-          </Typography>
-        </Box>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => navigate('/dashboard')}
+            sx={{ mt: 2, py: 1.5, borderRadius: 2 }}
+          >
+            Back to Dashboard
+          </Button>
+        </form>
       </Paper>
     </Box>
   );
 };
 
-export default AdminSetup; 
+export default AddAdmin; 

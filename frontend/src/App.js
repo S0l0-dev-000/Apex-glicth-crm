@@ -9,6 +9,7 @@ import Navbar from './components/Navbar';
 import Login from './components/Login';
 import Register from './components/Register';
 import AdminSetup from './components/AdminSetup';
+import AddAdmin from './components/AddAdmin';
 
 function UserDashboard() {
   return <div style={{textAlign: 'center', marginTop: '4rem'}}><h2>User Dashboard</h2><p>Welcome, regular user!</p></div>;
@@ -171,7 +172,7 @@ function App() {
   React.useEffect(() => {
     const checkAdminExists = async () => {
       try {
-        const response = await fetch(`https://apex-glicth-crm-v7kj.vercel.app/api/admin-exists`);
+        const response = await fetch(`https://backend-stere8xpq-solos-projects-3bdcd80e.vercel.app/api/admin-exists`);
         const data = await response.json();
         setAdminExists(data.adminExists);
       } catch (error) {
@@ -206,6 +207,7 @@ function App() {
           <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flex: 1 }}>
             <Routes>
               <Route path="/admin-setup" element={<AdminSetup />} />
+              <Route path="/add-admin" element={<AddAdmin />} />
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/register" element={<Register />} />
               <Route path="/user-dashboard" element={<UserDashboard />} />

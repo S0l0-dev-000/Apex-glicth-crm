@@ -24,7 +24,7 @@ const Navbar = ({ user, onLogout }) => {
     setMessage(''); setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://apex-glicth-crm-v7kj.vercel.app/api/change-password', {
+              const res = await fetch('https://backend-stere8xpq-solos-projects-3bdcd80e.vercel.app/api/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ currentPassword, newPassword })
@@ -40,7 +40,7 @@ const Navbar = ({ user, onLogout }) => {
     setMessage(''); setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://apex-glicth-crm-v7kj.vercel.app/api/change-email', {
+              const res = await fetch('https://backend-stere8xpq-solos-projects-3bdcd80e.vercel.app/api/change-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ newEmail })
@@ -55,7 +55,7 @@ const Navbar = ({ user, onLogout }) => {
     setAdminMessage(''); setAdminError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://apex-glicth-crm-v7kj.vercel.app/api/create-admin', {
+              const res = await fetch('https://backend-stere8xpq-solos-projects-3bdcd80e.vercel.app/api/create-admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword, secretCode: adminSecretCode })
@@ -167,7 +167,7 @@ const Navbar = ({ user, onLogout }) => {
                 Change Password
               </Button>
               {user && user.role === 'admin' && (
-                <Button color="inherit" onClick={() => setOpenCreateAdmin(true)} sx={{ borderRadius: 2, px: 3, py: 1 }}>
+                <Button color="inherit" component={RouterLink} to="/add-admin" sx={{ borderRadius: 2, px: 3, py: 1 }}>
                   Add Admin
                 </Button>
               )}

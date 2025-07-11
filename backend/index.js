@@ -63,8 +63,27 @@ app.get('/', (req, res) => {
   res.send('CRM Backend is running!');
 });
 
-// Check if admin exists
+// Public endpoint - Check if admin exists
+app.get('/admin-exists', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  db.get('SELECT COUNT(*) as count FROM users WHERE role = ?', ['admin'], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ adminExists: row.count > 0 });
+  });
+});
+
+// Check if admin exists (alternative endpoint)
 app.get('/api/admin-exists', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
   db.get('SELECT COUNT(*) as count FROM users WHERE role = ?', ['admin'], (err, row) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -318,6 +337,10 @@ app.get('/api/documents/:id/download', (req, res) => {
 
 // Register endpoint (for initial admin setup)
 app.post('/api/register', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
   const { email, password, secretCode } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
@@ -395,8 +418,9 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Protect customer and document routes
-app.use(['/api/customers', '/api/customers/:id', '/api/customers/:id/documents'], authenticateToken);
+// Protect customer and document routes (but not admin setup routes)
+app.use('/api/customers', authenticateToken);
+app.use('/api/documents', authenticateToken);
 
 // Change password endpoint (admin or user)
 app.post('/api/change-password', authenticateToken, async (req, res) => {
