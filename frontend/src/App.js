@@ -7,6 +7,11 @@ import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
 import Navbar from './components/Navbar';
 import Login from './components/Login';
+import Register from './components/Register';
+
+function UserDashboard() {
+  return <div style={{textAlign: 'center', marginTop: '4rem'}}><h2>User Dashboard</h2><p>Welcome, regular user!</p></div>;
+}
 
 const theme = createTheme({
   palette: {
@@ -183,6 +188,8 @@ function App() {
           <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flex: 1 }}>
             <Routes>
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/user-dashboard" element={<UserDashboard />} />
               <Route path="/*" element={
                 user && token ? (
                   <Routes>

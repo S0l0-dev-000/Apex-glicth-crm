@@ -324,6 +324,25 @@ app.post('/api/register', async (req, res) => {
   });
 });
 
+// Register endpoint (for regular users)
+app.post('/api/register-user', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  // Check if user already exists
+  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (user) return res.status(400).json({ error: 'User already exists' });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    db.run('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, 'user'], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: this.lastID, email, role: 'user' });
+    });
+  });
+});
+
 // Login endpoint
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;

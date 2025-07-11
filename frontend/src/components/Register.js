@@ -1,33 +1,28 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box, Paper, Typography, TextField, Button, Alert, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
-const Login = ({ onLogin }) => {
+const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/login`, { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-      if (onLogin) onLogin(res.data.user);
-      // Redirect based on role
-      if (res.data.user.role === 'admin') {
-        navigate('/customers');
-      } else {
-        navigate('/user-dashboard');
-      }
+      await axios.post(`${API_BASE_URL}/api/register-user`, { email, password });
+      setSuccess('Registration successful! You can now log in.');
+      setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -36,8 +31,9 @@ const Login = ({ onLogin }) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
       <Paper elevation={3} sx={{ p: 4, minWidth: 350 }}>
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>Admin Login</Typography>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: 700 }}>Register as User</Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Email"
@@ -65,15 +61,12 @@ const Login = ({ onLogin }) => {
             disabled={loading}
             sx={{ py: 1.5, fontWeight: 600 }}
           >
-            {loading ? <CircularProgress size={24} /> : 'Login'}
+            {loading ? <CircularProgress size={24} /> : 'Register'}
           </Button>
         </form>
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
-          <Link to="/register">Register as a regular user</Link>
-        </Box>
       </Paper>
     </Box>
   );
 };
 
-export default Login; 
+export default Register; 
