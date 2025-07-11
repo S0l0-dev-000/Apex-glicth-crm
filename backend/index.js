@@ -63,6 +63,16 @@ app.get('/', (req, res) => {
   res.send('CRM Backend is running!');
 });
 
+// Serve admin initialization page
+app.get('/init', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  const path = require('path');
+  res.sendFile(path.join(__dirname, 'init-admin.html'));
+});
+
 // Public endpoint - Check if admin exists
 app.get('/admin-exists', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
