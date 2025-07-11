@@ -6,6 +6,8 @@ const fs = require('fs');
 require('dotenv').config();
 const db = require('./db');
 const { sendCustomerNotification, sendDocumentNotification } = require('./emailService');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -302,6 +304,57 @@ app.get('/api/documents/:id/download', (req, res) => {
     res.download(filePath, document.original_filename);
   });
 });
+
+// Register endpoint (for initial admin setup)
+app.post('/api/register', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  // Check if user already exists
+  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (user) return res.status(400).json({ error: 'User already exists' });
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    db.run('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: this.lastID, email });
+    });
+  });
+});
+
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+    // Create JWT
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
+    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  });
+});
+
+// JWT authentication middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'No token provided' });
+  jwt.verify(token, process.env.JWT_SECRET || 'secret', (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+}
+
+// Protect customer and document routes
+app.use(['/api/customers', '/api/customers/:id', '/api/customers/:id/documents'], authenticateToken);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
