@@ -1,4 +1,4 @@
-# APEX GLITCH CRM - Deployment Guide
+# The King of Capital CRM - Deployment Guide
 
 ## 🚀 Quick Start Deployment
 
@@ -252,5 +252,5 @@ vercel --prod
 
 ---
 
-**APEX GLITCH CRM Deployment Guide**  
+**The King of Capital Deployment Guide**  
 *Last updated: July 2024* 

@@ -19,11 +19,11 @@ const sendCustomerNotification = async (customerData) => {
     const mailOptions = {
       from: process.env.EMAIL_USER || 'your-email@gmail.com',
       to: process.env.ADMIN_EMAIL || 'your-email@gmail.com', // Your email
-      subject: '🎉 New Customer Added - APEX GLITCH CRM',
+      subject: '🎉 New Customer Added - THE KING OF CAPITAL CRM',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="margin: 0; font-size: 24px;">APEX GLITCH CRM</h1>
+            <h1 style="margin: 0; font-size: 24px;">THE KING OF CAPITAL CRM</h1>
             <p style="margin: 5px 0 0 0; opacity: 0.9;">New Customer Notification</p>
           </div>
           
@@ -84,7 +84,7 @@ const sendCustomerNotification = async (customerData) => {
             
             <div style="margin-top: 20px; text-align: center;">
               <p style="color: #666; font-size: 14px;">
-                This notification was sent automatically by APEX GLITCH CRM
+                This notification was sent automatically by THE KING OF CAPITAL CRM
               </p>
             </div>
           </div>
@@ -109,11 +109,11 @@ const sendDocumentNotification = async (customerData, documentData) => {
     const mailOptions = {
       from: process.env.EMAIL_USER || 'your-email@gmail.com',
       to: process.env.ADMIN_EMAIL || 'your-email@gmail.com',
-      subject: '📄 New Document Uploaded - APEX GLITCH CRM',
+      subject: '📄 New Document Uploaded - THE KING OF CAPITAL CRM',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="margin: 0; font-size: 24px;">APEX GLITCH CRM</h1>
+            <h1 style="margin: 0; font-size: 24px;">THE KING OF CAPITAL CRM</h1>
             <p style="margin: 5px 0 0 0; opacity: 0.9;">Document Upload Notification</p>
           </div>
           

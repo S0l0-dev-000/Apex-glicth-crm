@@ -1,4 +1,4 @@
-# APEX GLITCH CRM System
+# The King of Capital CRM
 
 A full-stack Customer Relationship Management (CRM) system built with React frontend and Node.js backend, featuring email notifications, document management, and modern UI.
 
@@ -347,5 +347,5 @@ This documentation is maintained with the project. For the latest version, check
 
 ---
 
-**APEX GLITCH CRM** - Professional Customer Relationship Management System  
+**THE KING OF CAPITAL CRM** - Professional Customer Relationship Management System  
 *Built with React, Node.js, and deployed on Vercel* 
