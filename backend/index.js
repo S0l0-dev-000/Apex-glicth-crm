@@ -93,6 +93,76 @@ app.get('/api/admin-exists', (req, res) => {
   });
 });
 
+// Initialize first admin (public endpoint for setup)
+app.post('/api/init-admin', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  const { email, password, secretCode } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  
+  // Check secret code
+  const adminSecretCode = process.env.ADMIN_SECRET_CODE || 'lance';
+  if (!secretCode || secretCode !== adminSecretCode) {
+    return res.status(403).json({ error: 'Invalid secret code' });
+  }
+  
+  try {
+    // Check if any admin already exists
+    const adminExists = await new Promise((resolve, reject) => {
+      db.get('SELECT COUNT(*) as count FROM users WHERE role = ?', ['admin'], (err, row) => {
+        if (err) reject(err);
+        else resolve(row.count > 0);
+      });
+    });
+    
+    if (adminExists) {
+      return res.status(403).json({ error: 'Admin already exists. This endpoint is only for initial setup.' });
+    }
+    
+    // Check if user already exists
+    const userExists = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+    
+    if (userExists) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Insert admin user
+    const userId = await new Promise((resolve, reject) => {
+      db.run('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', 
+        [email, hashedPassword, 'admin'], 
+        function(err) {
+          if (err) reject(err);
+          else resolve(this.lastID);
+        }
+      );
+    });
+    
+    res.json({ 
+      id: userId, 
+      email, 
+      role: 'admin',
+      message: 'Admin account created successfully!' 
+    });
+    
+  } catch (error) {
+    console.error('Error creating admin:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET all customers
 app.get('/api/customers', (req, res) => {
   db.all('SELECT * FROM customers ORDER BY created_at DESC', (err, rows) => {
