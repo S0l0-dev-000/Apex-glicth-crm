@@ -4,6 +4,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import BusinessIcon from '@mui/icons-material/Business';
 import AddIcon from '@mui/icons-material/Add';
 import PeopleIcon from '@mui/icons-material/People';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 const Navbar = ({ user, onLogout }) => {
   const [openPassword, setOpenPassword] = useState(false);
@@ -119,6 +122,24 @@ const Navbar = ({ user, onLogout }) => {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {user && user.role === 'admin' && (
+            <Button 
+              color="inherit" 
+              component={RouterLink} 
+              to="/dashboard"
+              startIcon={<DashboardIcon />}
+              sx={{
+                borderRadius: 2,
+                px: 3,
+                py: 1,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
+            >
+              Dashboard
+            </Button>
+          )}
           <Button 
             color="inherit" 
             component={RouterLink} 
@@ -135,6 +156,24 @@ const Navbar = ({ user, onLogout }) => {
           >
             Customers
           </Button>
+          {user && user.role === 'admin' && (
+            <Button 
+              color="inherit" 
+              component={RouterLink} 
+              to="/admin/analytics"
+              startIcon={<AnalyticsIcon />}
+              sx={{
+                borderRadius: 2,
+                px: 3,
+                py: 1,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
+            >
+              Analytics
+            </Button>
+          )}
           <Button 
             color="inherit" 
             component={RouterLink} 
@@ -167,8 +206,14 @@ const Navbar = ({ user, onLogout }) => {
                 Change Password
               </Button>
               {user && user.role === 'admin' && (
-                <Button color="inherit" component={RouterLink} to="/add-admin" sx={{ borderRadius: 2, px: 3, py: 1 }}>
-                  Add Admin
+                <Button 
+                  color="inherit" 
+                  component={RouterLink} 
+                  to="/admin/users" 
+                  startIcon={<AdminPanelSettingsIcon />}
+                  sx={{ borderRadius: 2, px: 3, py: 1 }}
+                >
+                  Admin Panel
                 </Button>
               )}
               <Button color="inherit" onClick={onLogout} sx={{ borderRadius: 2, px: 3, py: 1 }}>

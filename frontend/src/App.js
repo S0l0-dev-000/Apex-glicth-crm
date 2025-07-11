@@ -10,6 +10,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import AdminSetup from './components/AdminSetup';
 import AddAdmin from './components/AddAdmin';
+import AdminDashboard from './components/AdminDashboard';
+import UserManagement from './components/UserManagement';
+import Analytics from './components/Analytics';
 
 function UserDashboard() {
   return <div style={{textAlign: 'center', marginTop: '4rem'}}><h2>User Dashboard</h2><p>Welcome, regular user!</p></div>;
@@ -218,7 +221,11 @@ function App() {
                   <AdminSetup />
                 ) : user && token ? (
                   <Routes>
-                    <Route path="/" element={<CustomerList />} />
+                    <Route path="/" element={user.role === 'admin' ? <AdminDashboard /> : <CustomerList />} />
+                    <Route path="/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/users" element={<UserManagement />} />
+                    <Route path="/admin/analytics" element={<Analytics />} />
                     <Route path="/customers" element={<CustomerList />} />
                     <Route path="/customers/new" element={<CustomerForm />} />
                     <Route path="/customers/:id" element={<CustomerForm />} />
