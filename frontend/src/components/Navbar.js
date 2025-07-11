@@ -13,6 +13,11 @@ const Navbar = ({ user, onLogout }) => {
   const [newEmail, setNewEmail] = useState(user?.email || '');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [openCreateAdmin, setOpenCreateAdmin] = useState(false);
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [adminMessage, setAdminMessage] = useState('');
+  const [adminError, setAdminError] = useState('');
 
   const handlePasswordChange = async () => {
     setMessage(''); setError('');
@@ -43,6 +48,22 @@ const Navbar = ({ user, onLogout }) => {
       if (!res.ok) throw new Error(data.error || 'Failed to change email');
       setMessage('Email updated successfully!');
     } catch (e) { setError(e.message); }
+  };
+
+  const handleCreateAdmin = async () => {
+    setAdminMessage(''); setAdminError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/create-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create admin');
+      setAdminMessage('Admin created successfully!');
+      setNewAdminEmail(''); setNewAdminPassword('');
+    } catch (e) { setAdminError(e.message); }
   };
 
   return (
@@ -144,6 +165,11 @@ const Navbar = ({ user, onLogout }) => {
               <Button color="inherit" onClick={() => setOpenPassword(true)} sx={{ borderRadius: 2, px: 3, py: 1 }}>
                 Change Password
               </Button>
+              {user && user.role === 'admin' && (
+                <Button color="inherit" onClick={() => setOpenCreateAdmin(true)} sx={{ borderRadius: 2, px: 3, py: 1 }}>
+                  Add Admin
+                </Button>
+              )}
               <Button color="inherit" onClick={onLogout} sx={{ borderRadius: 2, px: 3, py: 1 }}>
                 Logout
               </Button>
@@ -198,6 +224,32 @@ const Navbar = ({ user, onLogout }) => {
         <DialogActions>
           <Button onClick={() => setOpenEmail(false)}>Cancel</Button>
           <Button onClick={handleEmailChange} variant="contained">Change</Button>
+        </DialogActions>
+      </Dialog>
+      {/* Create Admin Dialog */}
+      <Dialog open={openCreateAdmin} onClose={() => setOpenCreateAdmin(false)}>
+        <DialogTitle>Add New Admin</DialogTitle>
+        <DialogContent>
+          {adminMessage && <Alert severity="success">{adminMessage}</Alert>}
+          {adminError && <Alert severity="error">{adminError}</Alert>}
+          <TextField
+            label="Admin Email"
+            type="email"
+            value={newAdminEmail}
+            onChange={e => setNewAdminEmail(e.target.value)}
+            fullWidth sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Admin Password"
+            type="password"
+            value={newAdminPassword}
+            onChange={e => setNewAdminPassword(e.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenCreateAdmin(false)}>Cancel</Button>
+          <Button onClick={handleCreateAdmin} variant="contained">Create</Button>
         </DialogActions>
       </Dialog>
     </AppBar>

@@ -311,15 +311,20 @@ app.post('/api/register', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
-  // Check if user already exists
-  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+  // Check if any admin already exists
+  db.get('SELECT * FROM users WHERE role = ?', ['admin'], async (err, admin) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (user) return res.status(400).json({ error: 'User already exists' });
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    db.run('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], function(err) {
+    if (admin) return res.status(403).json({ error: 'Admin registration is disabled. An admin already exists.' });
+    // Check if user already exists
+    db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, email });
+      if (user) return res.status(400).json({ error: 'User already exists' });
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      db.run('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, 'admin'], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ id: this.lastID, email });
+      });
     });
   });
 });
@@ -407,6 +412,26 @@ app.post('/api/change-email', authenticateToken, async (req, res) => {
     db.run('UPDATE users SET email = ? WHERE id = ?', [newEmail, req.user.id], function(err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Email updated successfully', newEmail });
+    });
+  });
+});
+
+// Create new admin (only for logged-in admins)
+app.post('/api/create-admin', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can create other admins.' });
+  }
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (user) return res.status(400).json({ error: 'User already exists' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    db.run('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, 'admin'], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id: this.lastID, email, role: 'admin' });
     });
   });
 });
