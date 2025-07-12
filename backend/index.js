@@ -537,8 +537,9 @@ function authenticateToken(req, res, next) {
 }
 
 // Protect customer and document routes (but not admin setup routes)
-app.use('/api/customers', authenticateToken);
-app.use('/api/documents', authenticateToken);
+// TEMPORARILY DISABLED - Authentication removed for now
+// app.use('/api/customers', authenticateToken);
+// app.use('/api/documents', authenticateToken);
 
 // Change password endpoint (admin or user)
 app.post('/api/change-password', authenticateToken, async (req, res) => {

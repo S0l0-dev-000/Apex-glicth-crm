@@ -226,7 +226,7 @@ function App() {
           minHeight: '100vh',
           backgroundColor: '#f8fafc'
         }}>
-          <Navbar user={user} onLogout={handleLogout} />
+          <Navbar user={null} onLogout={handleLogout} />
           <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flex: 1 }}>
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
@@ -236,23 +236,17 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/user-dashboard" element={<UserDashboard />} />
                 <Route path="/*" element={
-                  // Show admin setup if no admin exists
-                  adminExists === false ? (
-                    <AdminSetup />
-                  ) : user && token ? (
-                    <Routes>
-                      <Route path="/" element={user.role === 'admin' ? <AdminDashboard /> : <CustomerList />} />
-                      <Route path="/dashboard" element={<AdminDashboard />} />
-                      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                      <Route path="/admin/users" element={<UserManagement />} />
-                      <Route path="/admin/analytics" element={<Analytics />} />
-                      <Route path="/customers" element={<CustomerList />} />
-                      <Route path="/customers/new" element={<CustomerForm />} />
-                      <Route path="/customers/:id" element={<CustomerForm />} />
-                    </Routes>
-                  ) : (
-                    <Login onLogin={handleLogin} />
-                  )
+                  // TEMPORARILY DISABLED - Skip authentication for now
+                  <Routes>
+                    <Route path="/" element={<CustomerList />} />
+                    <Route path="/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/users" element={<UserManagement />} />
+                    <Route path="/admin/analytics" element={<Analytics />} />
+                    <Route path="/customers" element={<CustomerList />} />
+                    <Route path="/customers/new" element={<CustomerForm />} />
+                    <Route path="/customers/:id" element={<CustomerForm />} />
+                  </Routes>
                 } />
               </Routes>
             </Suspense>
