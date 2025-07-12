@@ -4,8 +4,8 @@ const config = {
     uploadUrl: 'http://localhost:3001'
   },
   production: {
-    apiUrl: process.env.REACT_APP_API_URL || 'https://backend-dfx6bhk1p-solos-projects-3bdcd80e.vercel.app',
-    uploadUrl: process.env.REACT_APP_UPLOAD_URL || 'https://backend-dfx6bhk1p-solos-projects-3bdcd80e.vercel.app'
+    apiUrl: process.env.REACT_APP_API_URL || 'https://backend-apvnjb7m2-solos-projects-3bdcd80e.vercel.app',
+    uploadUrl: process.env.REACT_APP_UPLOAD_URL || 'https://backend-apvnjb7m2-solos-projects-3bdcd80e.vercel.app'
   }
 };
 
