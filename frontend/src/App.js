@@ -183,35 +183,36 @@ const theme = createTheme({
 });
 
 function App() {
-  const [user, setUser] = React.useState(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [adminExists, setAdminExists] = React.useState(null);
-  const token = localStorage.getItem('token');
+  // TEMPORARILY DISABLED - Authentication variables removed
+  // const [user, setUser] = React.useState(() => {
+  //   const stored = localStorage.getItem('user');
+  //   return stored ? JSON.parse(stored) : null;
+  // });
+  // const [adminExists, setAdminExists] = React.useState(null);
+  // const token = localStorage.getItem('token');
 
-  // Check if admin exists on app load
-  React.useEffect(() => {
-    const checkAdminExists = async () => {
-      try {
-        const { API_BASE_URL } = await import('./config');
-        const response = await fetch(`${API_BASE_URL}/api/admin-exists`);
-        const data = await response.json();
-        setAdminExists(data.adminExists);
-      } catch (error) {
-        console.error('Error checking admin existence:', error);
-        setAdminExists(false);
-      }
-    };
-    checkAdminExists();
-  }, []);
+  // TEMPORARILY DISABLED - Authentication logic removed
+  // React.useEffect(() => {
+  //   const checkAdminExists = async () => {
+  //     try {
+  //       const { API_BASE_URL } = await import('./config');
+  //       const response = await fetch(`${API_BASE_URL}/api/admin-exists`);
+  //       const data = await response.json();
+  //       setAdminExists(data.adminExists);
+  //     } catch (error) {
+  //       console.error('Error checking admin existence:', error);
+  //       setAdminExists(false);
+  //     }
+  //   };
+  //   checkAdminExists();
+  // }, []);
 
   const handleLogin = (user) => {
-    setUser(user);
-    setAdminExists(true); // Admin exists after login
+    // setUser(user);
+    // setAdminExists(true); // Admin exists after login
   };
   const handleLogout = () => {
-    setUser(null);
+    // setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
